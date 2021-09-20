@@ -1,0 +1,30 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.portrait {
+  z-index: 5;
+  position: absolute;
+  left: 0;
+}
+
+.eye {
+  z-index: 3;
+  transition: all 0.5s ease-out;
+  width: 17px;
+  position: absolute;
+}
+
+.eye.first {
+  left: 0;
+}
+.eye.second {
+  left: -62px;
+}
+.white-eye {
+  width: 600px;
+  position: absolute;
+  left: 0;
+  z-index: 0;
+}
