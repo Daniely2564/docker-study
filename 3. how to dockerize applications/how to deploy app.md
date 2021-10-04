@@ -113,3 +113,150 @@ $ docker run -it react-app sh
 / # node --version
 v14.17.6
 ```
+
+And now we have the base image, the next thing we need to do is to copy the application files into the image.
+
+You can use either add/copy. Using the command, we can copy files/directories into the image. But we cannot copy anything from outside of the image.
+
+**WHY**: when you build using docker, `docker build [docker directory]`,
+
+```Dockerfile
+COPY [...files/directories to copy] [directoy to copy]
+```
+
+**Example**
+
+```Dockerfile
+COPY package.json README.md /app
+```
+
+We can also use wild card
+
+```Dockerfile
+COPY package*.json README.md /app
+```
+
+If you want to copy everything inside of the directory, we use "."
+
+```Dockerfile
+COPY . /app/
+```
+
+3. Setting the working directory
+   It is going to set the working directory and the rest of the commands inside of the working directory.
+
+```Dockerfile
+FROM node:14.17-alpine
+WORKDIR /app
+COPY hello world.txt .
+```
+
+It takes an array of arguments, `COPY ["hello.txt", "."]`
+
+**Copy entire directory**
+
+```Dockerfile
+COPY . .
+ADD . .
+```
+
+Unlike copy, using `ADD`, you can use file from web or add compressed file.
+
+```Dockerfile
+ADD http://...something.zip .
+```
+
+```Dockerfile
+ADD file.zip .
+```
+
+4. Docker Ignore file
+
+Use `.dockerignore` and list files that you wish docker to ignore.
+
+`.dockerignore`
+
+```
+node_modules
+```
+
+5. Running the command using `RUN`
+
+Use `RUN` to run commands.
+
+```Dockerfile
+RUN npm install
+```
+
+This below line throws error because apt is not installed in our machine.
+
+```Dockerfile
+RUN apt install  python.
+```
+
+6. Setting the environment variables
+
+Use `ENV` to set environment variables
+
+```Dockerfile
+ENV API_URL=http://something.com
+```
+
+```Dockerfile
+ENV API_URL http://something.com
+```
+
+You can use any of the two.
+
+7. Exposing the application port using `EXPOSE`
+
+However using this EXPOSE is just letting the docker know that it will use the port 3000. It won't necessarily allow you to connect to the port 3000.
+
+```Dockerfile
+EXPOSE 3000
+```
+
+We need to map our device to set our port to listen to docker port 3000.
+
+8. Managing user
+
+By default, docker uses root user in the machine. But this can cause security holes in the system. To run the system securely, we create user and assign the least amount of previledges needed to run the program.
+
+we will -G and -S from `adduser`. We use `-G` so that we can set primary group of the user and `-S` to create a system user. It is a system user because it is not an actual user, but a user to run the system.
+
+```sh
+addgroup [groupname]
+adduser -S -G [groupname] [username]
+```
+
+example
+
+```sh
+addgroup app
+adduser -S -G app app
+```
+
+It is common best practice. Whenever we create a new user, we create a primary group with the same name.
+
+```sh
+groups app
+```
+
+```
+app
+```
+
+We can combine this command using the double &
+
+```sh
+addgroup app && adduser -S -G app app
+```
+
+We will run the above line in the dockerfile.
+
+Inside of `Dockerfile`, add a line
+
+```Dockerfile
+RUN addgroup app && adduser -S -G app app
+USER app
+```
